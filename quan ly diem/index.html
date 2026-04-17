@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý điểm học phần</title>
+
+<style>
+body {
+    font-family: 'Segoe UI';
+    margin: 0;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    transition: 0.3s;
+}
+
+.dark {
+    background: #121212;
+    color: white;
+}
+
+.container {
+    width: 80%;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.dark .container {
+    background: #1e1e1e;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form {
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #4facfe;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #007bff;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #4facfe;
+    color: white;
+}
+
+td, th {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+
+.dark tr:hover {
+    background: #333;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.gpa {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 15px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="top-bar">
+    <button onclick="toggleDark()">🌙 Dark Mode</button>
+    <button onclick="resetData()">🗑 Reset</button>
+</div>
+
+<h1>📚 Quản lý điểm học phần</h1>
+
+<div class="form">
+    <input id="ten" placeholder="Tên môn">
+    <input id="tinchi" type="number" placeholder="Tín chỉ">
+    <input id="diem" type="number" placeholder="Điểm (0-10)">
+    <button onclick="themMon()">Thêm</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Môn</th>
+<th>TC</th>
+<th>Điểm</th>
+<th>Xóa</th>
+</tr>
+</thead>
+<tbody id="bang"></tbody>
+</table>
+
+<div class="gpa">
+GPA (10): <span id="gpa10">0</span> |
+GPA (4): <span id="gpa4">0</span>
+</div>
+
+</div>
+
+<script>
+let ds = JSON.parse(localStorage.getItem("ds")) || [];
+
+function luu() {
+    localStorage.setItem("ds", JSON.stringify(ds));
+}
+
+function themMon() {
+    let ten = tenInput.value;
+    let tc = parseFloat(tinchi.value);
+    let diem = parseFloat(diemInput.value);
+
+    if (!ten || isNaN(tc) || isNaN(diem)) {
+        alert("Nhập đầy đủ!");
+        return;
+    }
+
+    ds.push({ ten, tc, diem });
+    luu();
+    hienThi();
+
+    tenInput.value = "";
+    tinchi.value = "";
+    diemInput.value = "";
+}
+
+const tenInput = document.getElementById("ten");
+const diemInput = document.getElementById("diem");
+
+function hienThi() {
+    let html = "";
+    let tongDiem = 0, tongTC = 0;
+
+    ds.forEach((m, i) => {
+        tongDiem += m.diem * m.tc;
+        tongTC += m.tc;
+
+        html += `
+        <tr>
+            <td>${m.ten}</td>
+            <td>${m.tc}</td>
+            <td>${m.diem}</td>
+            <td><button onclick="xoa(${i})">X</button></td>
+        </tr>`;
+    });
